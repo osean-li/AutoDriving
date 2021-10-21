@@ -1,0 +1,33 @@
+﻿document.oncontextmenu = function () {
+    return false;
+}
+document.onkeydown = function () {
+    if (event.ctrlKey && window.event.keyCode == 67) {
+        return false;
+    }
+}
+document.oncopy = function () {
+    return false;
+}
+document.onselectstart = function () {
+    return false;
+}
+document.onpaste = function () {
+    return false;
+}
+document.oncut = function () {
+    return false;
+}
+document.ondragstart = function () {
+    return false;
+}
+document.onselect = function () {
+    document.selection.empty();
+}
+document.onbeforecopy = function () {
+    return false;
+}
+document.onmouseup = function () {
+    document.selection.empty();
+}
+
