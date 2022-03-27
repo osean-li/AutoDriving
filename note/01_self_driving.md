@@ -32,7 +32,61 @@
 >
 > |硬盘：西数黑盘500G 
 
-### 3.1.2前置依赖软件
+
+
+### 3.2-GPU版
+
+> |CPU:Intel 11代酷睿i9 11900（八核十六线程，最大睿频5.2GHz）
+>
+> |内存：威刚DDR4 32G 3200（可根据需求扩展至128G）
+>
+> |硬盘：西数黑盘500G 
+>
+> |显卡：NVIDIA GeForce RTX2060 12G
+
+ **安装 NVIDIA 显卡驱动**
+
+可以通过界面的方式安装
+
+随后，可以通过在终端中执行 `nvidia-smi` 命令来查看 NVIDIA 显卡工作是否正常（完成驱动安装后可能需要重启），正常情况下终端将显示下面的信息：
+
+> Sun Mar 27 10:35:07 2022
+> +-----------------------------------------------------------------------------+
+> | NVIDIA-SMI 470.103.01   Driver Version: 470.103.01   CUDA Version: 11.4     |
+> |-------------------------------+----------------------+----------------------+
+> | GPU  Name        Persistence-M| Bus-Id        Disp.A | Volatile Uncorr. ECC |
+> | Fan  Temp  Perf  Pwr:Usage/Cap|         Memory-Usage | GPU-Util  Compute M. |
+> |                               |                      |               MIG M. |
+> |===============================+======================+======================|
+> |   0  NVIDIA GeForce ...  Off  | 00000000:01:00.0  On |                  N/A |
+> |  0%   37C    P8    20W / 184W |    553MiB / 12026MiB |      7%      Default |
+> |                               |                      |                  N/A |
+> +-------------------------------+----------------------+----------------------+
+>
+> +-----------------------------------------------------------------------------+
+> | Processes:                                                                  |
+> |  GPU   GI   CI        PID   Type   Process name                  GPU Memory |
+> |        ID   ID                                                   Usage      |
+> |=============================================================================|
+> |    0   N/A  N/A      1113      G   /usr/lib/xorg/Xorg                215MiB |
+> |    0   N/A  N/A      1343      G   /usr/bin/gnome-shell               61MiB |
+> |    0   N/A  N/A      2819      G   /usr/lib/firefox/firefox          226MiB |
+> |    0   N/A  N/A      5156      G   ...404678048605711115,131072        8MiB |
+> |    0   N/A  N/A     24499      G   ...AAAAAAAAA= --shared-files       33MiB |
+> |    0   N/A  N/A     25945      G   /usr/lib/firefox/firefox            1MiB |
+> +-----------------------------------------------------------------------------+
+
+**安装 NVIDIA 容器工具包**
+
+如果是在物理机中安装的 Ubuntu，且机器配有 NVIDIA 显卡，在安装了驱动的前提下，还需要安装 NVIDIA 容器工具包以运行 Apollo Docker 镜像中的 CUDA：
+
+> distribution=$(. /etc/os-release;echo $ID$VERSION_ID)
+> curl -s -L https://nvidia.github.io/nvidia-docker/gpgkey | sudo apt-key add -
+> curl -s -L https://nvidia.github.io/nvidia-docker/$distribution/nvidia-docker.list | sudo tee /etc/apt/sources.list.d/nvidia-docker.list
+> sudo apt-get -y update
+> sudo apt-get install -y nvidia-docker2
+
+### 前置依赖软件
 
 - 安装 Ubuntu 18.04
 - 安装 Git
@@ -102,15 +156,21 @@ sudo ./docker/scripts/dev_into.sh
 
 ![[进入 Apollo docker 开发容器](https://i.loli.net/2021/07/24/9tBsgUKxDkVAjXb.png)](D:\自动驾驶\AutoDriving\note\picture\微信截图_20220302214541.png)
 
-
+若提示 `[WARNING] nvidia-smi not found. CPU will be used.` 请确认是否要用gpu编译，不是则忽略。若是，请检查NVIDIA 容器工具包 是否安装，重新执行`sudo ./docker/scripts/dev_start.sh`可解决。 
 
 ### 3.1.5容器中构建 Apollo
 
-进入 Apollo Docker 开发容器后，在容器终端中执行下述命令构建 Apollo：
+进入 Apollo Docker 开发容器后，在容器终端中执行下述命令构建 Apollo：sudo ./apollo.sh build 自动适配用cpu编译还是gpu
 
 ```
 sudo ./apollo.sh build 
 ```
+
+![image-20220327104702662](D:\自动驾驶\AutoDriving\note\picture\image-20220327104702662.png)
+
+用时739秒编译成功后如下 Enjoy！
+
+![image-20220327104521869](D:\自动驾驶\AutoDriving\note\picture\image-20220327104521869.png)
 
 ### 3.1.6运行 Apollo
 
@@ -157,3 +217,10 @@ cyber_recorder play -f demo_3.5.record -l
 至此，DreamView 界面中将呈现出自车规划轨迹、他车预测轨迹、路网等各种信息：
 
 ![1646231298454](D:\自动驾驶\AutoDriving\note\picture\1646231298454.gif)
+
+# 参考
+
+https://blog.shipengx.com/archives/e4b9c8ad.html
+
+https://blog.csdn.net/weixin_45929038/article/details/120113008
+

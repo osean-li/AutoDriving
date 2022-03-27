@@ -154,7 +154,74 @@ routing模块都按照cyber的模块申明和注册，cyber框架负责调用Ini
 
 上述的过程总结一下就是，首先读取routing_map并初始化Navigator类，接着遍历routing_request，因为routing_request请求为一个个的点，所以先查看routing_request的点是否在路上，不在路上则找到最近的路，并且补充信息（不在路上的点则过不去），最后调用"navigator_ptr_->SearchRoute"返回routing响应。
 
+
+
 ![image-20211028233013398](C:\Users\HW\AppData\Roaming\Typora\typora-user-images\image-20211028233013398.png)
+
+
 
 ## **Navigator类**
 
+
+
+
+
+# 小结
+
+1. 何从A点到B点？-采用的是A* 算法
+
+2. 如何规避某些点？ - 查找的时候发现是黑名单里的节点，则选择跳过
+
+3. 如何途径某些点？- 采用分段的形式，逐段导航（改进版的算法是不给定点的顺序，自动规划最优的线路）
+
+4. 如何设置固定线路，而且不会变？最后routing输出的结果是RoutingResponse****
+
+   `RoutingResponse`中的属性说明如下：
+
+   | 名称            | 说明                         |
+   | :-------------- | :--------------------------- |
+   | header          | 消息头                       |
+   | road            | 具体的路径信息，最重要的数据 |
+   | measurement     | 距离                         |
+   | routing_request | 原始请求                     |
+   | map_version     | 地图版本                     |
+   | status          | 状态位                       |
+
+
+
+| 类型名称        | 描述                                                         |
+| :-------------- | :----------------------------------------------------------- |
+| LaneWaypoint    | 道路上的路径点，包含了id，长度和位置点信息。                 |
+| LaneSegment     | 道路的一段，包含了id和起止点信息。                           |
+| RoutingRequest  | 描述了路由请求的信息，一次路由请求可以包含多个路径点。详细结构见下文。 |
+| Measurement     | 描述测量的距离。                                             |
+| ChangeLaneType  | 道路的类型，有FORWARD，LEFT，RIGHT三种取值。                 |
+| Passage         | 一段通路，其中可以包含多个LaneSegment，以及ChangeLaneType。  |
+| RoadSegment     | 道路的一段，拥有一个id，并可以包含多个Passage。              |
+| RoutingResponse | 路由请求的响应结果，可以包含多个RoadSegment，距离等信息。    |
+
+| 类型名称   | 描述                                                         |
+| :--------- | :----------------------------------------------------------- |
+| CurvePoint | 曲线上的一个点。                                             |
+| CurveRange | 曲线上的一段。                                               |
+| Node       | 车道上的一个节点，包含了所属车道，道路，长度，曲线起止点，中心线等信息。 |
+| Edge       | 连接车道之间的边，包含了起止车道id，代价和方向等信息。       |
+| Graph      | 完整地图的Topo结构，这其中包含了多个Node和Edge。             |
+
+| 类名             | 描述                                                         |
+| :--------------- | :----------------------------------------------------------- |
+| TopoNode         | Topo地图中的一个节点。包含了所属Lane和Road等信息。 很显然，这是Topo地图中的核心数据结构。 |
+| TopoEdge         | 连接TopoNode之间的边，该结构中包含了起止TopoNode等信息。     |
+| NodeSRange       | 描述节点的某一段范围。一个TopoNode可以分为若干个NodeSRange。 |
+| NodeWithRange    | 描述节点及其范围，该类是NodeSRange的子类。                   |
+| TopoRangeManager | NodeSRange的管理器。可以进行查找，添加，排序和合并操作。     |
+| SubTopoGraph     | Topo子图，由搜索算法所用（目前是A*搜索算法）。               |
+| TopoGraph        | 对应了整个Topo地图。其构造函数需要一个Proto结构导出的地图文件， 它将从地图文件中读取完整的Topo结构。 |
+
+
+
+# 参考
+
+https://paul.pub/apollo-routing/
+
+https://zhuanlan.zhihu.com/p/65533164
