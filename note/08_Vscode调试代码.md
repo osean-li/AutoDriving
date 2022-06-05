@@ -62,6 +62,10 @@ bash docker/scripts/dev_start.sh
 
 > `bash apollo.sh build_dbg`
 
+launch.json 文件创建
+
+![img](https://img2020.cnblogs.com/blog/1108382/202012/1108382-20201208111151727-1330381940.png)
+
 **生成调试文件，可参考launch.json**
 
 > {
@@ -96,6 +100,14 @@ bash docker/scripts/dev_start.sh
 
 本launch.json文件以调试localization模块为例，其中program为mainboard可执行文件的路径，用于运行dag文件，args为要调试模块的dag文件，若要调试其他模块，修改args即可。
 注意：cwd必须为Apollo项目所在路径，否则调试过程中会找不到相关的代码文件。
+
+【VSCode】VsCode找不到类型为 “cppdbg“ 的调试适配器。
+
+解决方案：
+
+1. 卸载掉vscode的C/C++扩展
+2. 重新安装C/C++扩展
+3. 解决~
 
 ## 容器环境调试apollo
 
